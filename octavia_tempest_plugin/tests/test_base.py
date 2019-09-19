@@ -51,10 +51,7 @@ class LoadBalancerBaseTest(test.BaseTestCase):
 
     # Setup cls.os_roles_lb_member. cls.os_primary, cls.os_roles_lb_member,
     # and cls.os_roles_lb_admin credentials.
-    credentials = ['admin', 'primary',
-                   ['lb_member', CONF.load_balancer.member_role],
-                   ['lb_member2', CONF.load_balancer.member_role],
-                   ['lb_admin', CONF.load_balancer.admin_role]]
+    credentials = ['admin', ['lb_member', CONF.load_balancer.member_role]]
 
     client_manager = clients.ManagerV2
     webserver1_response = 1
@@ -121,15 +118,15 @@ class LoadBalancerBaseTest(test.BaseTestCase):
             cls.os_roles_lb_member.healthmonitor_client)
         cls.mem_l7policy_client = cls.os_roles_lb_member.l7policy_client
         cls.mem_l7rule_client = cls.os_roles_lb_member.l7rule_client
-        cls.lb_admin_amphora_client = cls.os_roles_lb_admin.amphora_client
+        cls.lb_admin_amphora_client = cls.os_admin.amphora_client
         cls.lb_admin_flavor_profile_client = (
-            cls.os_roles_lb_admin.flavor_profile_client)
-        cls.lb_admin_flavor_client = cls.os_roles_lb_admin.flavor_client
+            cls.os_admin.flavor_profile_client)
+        cls.lb_admin_flavor_client = cls.os_admin.flavor_client
         cls.mem_flavor_client = cls.os_roles_lb_member.flavor_client
         cls.mem_provider_client = cls.os_roles_lb_member.provider_client
         cls.os_admin_servers_client = cls.os_admin.servers_client
         cls.lb_admin_capabilities_client = (
-            cls.os_roles_lb_admin.flavor_capabilities_client)
+            cls.os_admin.flavor_capabilities_client)
 
     @classmethod
     def resource_setup(cls):
@@ -505,8 +502,7 @@ class LoadBalancerBaseTestWithCompute(LoadBalancerBaseTest):
             cls.lb_mem_keypairs_client.show_keypair,
             keypair_name)
 
-        if (CONF.load_balancer.enable_security_groups and
-                CONF.network_feature_enabled.port_security):
+        if CONF.load_balancer.enable_security_groups:
             # Set up the security group for the webservers
             SG_name = data_utils.rand_name('lb_member_SG')
             cls.lb_member_sec_group = (
@@ -707,8 +703,7 @@ class LoadBalancerBaseTestWithCompute(LoadBalancerBaseTest):
             'flavorRef': CONF.compute.flavor_ref,
             'imageRef': CONF.compute.image_ref,
             'key_name': cls.lb_member_keypair['name']}
-        if (CONF.load_balancer.enable_security_groups and
-                CONF.network_feature_enabled.port_security):
+        if CONF.load_balancer.enable_security_groups:
             server_kwargs['security_groups'] = [
                 {'name': cls.lb_member_sec_group['name']}]
         if not CONF.load_balancer.disable_boot_network:
