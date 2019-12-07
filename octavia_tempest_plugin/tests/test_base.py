@@ -865,11 +865,15 @@ class LoadBalancerBaseTestWithCompute(LoadBalancerBaseTest):
 
         self._wait_for_lb_functional(vip_address, protocol, verify)
 
+        # (catalyst) There is a chance that the load balancer is not ready
+        # to receive traffic because of networking issues.
+        time.sleep(10)
+
         # Send a number requests to lb vip
         for i in range(20):
             try:
                 r = session.get('{0}://{1}'.format(protocol, vip_address),
-                                timeout=2, verify=verify)
+                                timeout=5, verify=verify)
 
                 if r.content in response_counts:
                     response_counts[r.content] += 1
