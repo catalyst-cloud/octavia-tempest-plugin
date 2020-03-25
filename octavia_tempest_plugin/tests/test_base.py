@@ -845,12 +845,12 @@ class LoadBalancerBaseTestWithCompute(LoadBalancerBaseTest):
         while time.time() - start < CONF.load_balancer.build_timeout:
             try:
                 session.get("{0}://{1}".format(protocol, vip_address),
-                            timeout=2, verify=verify)
+                            timeout=5, verify=verify)
                 time.sleep(1)
                 return
             except Exception:
                 LOG.warning('Server is not passing initial traffic. Waiting.')
-                time.sleep(1)
+                time.sleep(3)
         LOG.error('Server did not begin passing traffic within the timeout '
                   'period. Failing test.')
         raise Exception()
@@ -863,11 +863,11 @@ class LoadBalancerBaseTestWithCompute(LoadBalancerBaseTest):
         if ipaddress.ip_address(vip_address).version == 6:
             vip_address = '[{}]'.format(vip_address)
 
-        self._wait_for_lb_functional(vip_address, protocol, verify)
-
         # (catalyst) There is a chance that the load balancer is not ready
         # to receive traffic because of networking issues.
         time.sleep(10)
+
+        self._wait_for_lb_functional(vip_address, protocol, verify)
 
         # Send a number requests to lb vip
         for i in range(20):
