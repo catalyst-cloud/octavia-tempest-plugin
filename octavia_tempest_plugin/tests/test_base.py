@@ -142,6 +142,7 @@ class LoadBalancerBaseTest(test.BaseTestCase):
             cls.os_admin.availability_zone_client)
         cls.mem_availability_zone_client = (
             cls.os_roles_lb_member.availability_zone_client)
+        cls.admin_lb_client = cls.os_admin.loadbalancer_client
 
     @classmethod
     def resource_setup(cls):

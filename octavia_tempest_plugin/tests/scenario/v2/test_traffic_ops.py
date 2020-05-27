@@ -47,9 +47,12 @@ class TrafficOperationsScenarioTest(test_base.LoadBalancerBaseTestWithCompute):
 
         lb = cls.mem_lb_client.create_loadbalancer(**lb_kwargs)
         cls.lb_id = lb[const.ID]
+
+        # (catalyst) Cascading delete load balancer, admin user in
+        # catalyst cloud is able to delete loadbalancers in any status.
         cls.addClassResourceCleanup(
-            cls.mem_lb_client.cleanup_loadbalancer,
-            cls.lb_id)
+            cls.admin_lb_client.delete_loadbalancer,
+            cls.lb_id, cascade=True, ignore_errors=True)
 
         waiters.wait_for_status(cls.mem_lb_client.show_loadbalancer,
                                 cls.lb_id, const.PROVISIONING_STATUS,
@@ -108,10 +111,10 @@ class TrafficOperationsScenarioTest(test_base.LoadBalancerBaseTestWithCompute):
         listener = cls.mem_listener_client.create_listener(
             **listener_kwargs)
         cls.listener_ids[protocol] = listener[const.ID]
-        cls.addClassResourceCleanup(
-            cls.mem_listener_client.cleanup_listener,
-            cls.listener_ids[protocol],
-            lb_client=cls.mem_lb_client, lb_id=cls.lb_id)
+        # cls.addClassResourceCleanup(
+        #     cls.mem_listener_client.cleanup_listener,
+        #     cls.listener_ids[protocol],
+        #     lb_client=cls.mem_lb_client, lb_id=cls.lb_id)
 
         waiters.wait_for_status(cls.mem_lb_client.show_loadbalancer,
                                 cls.lb_id, const.PROVISIONING_STATUS,
@@ -128,10 +131,10 @@ class TrafficOperationsScenarioTest(test_base.LoadBalancerBaseTestWithCompute):
         }
         pool = cls.mem_pool_client.create_pool(**pool_kwargs)
         cls.pool_ids[protocol] = pool[const.ID]
-        cls.addClassResourceCleanup(
-            cls.mem_pool_client.cleanup_pool,
-            cls.pool_ids[protocol],
-            lb_client=cls.mem_lb_client, lb_id=cls.lb_id)
+        # cls.addClassResourceCleanup(
+        #     cls.mem_pool_client.cleanup_pool,
+        #     cls.pool_ids[protocol],
+        #     lb_client=cls.mem_lb_client, lb_id=cls.lb_id)
 
         waiters.wait_for_status(cls.mem_lb_client.show_loadbalancer,
                                 cls.lb_id, const.PROVISIONING_STATUS,
@@ -159,10 +162,10 @@ class TrafficOperationsScenarioTest(test_base.LoadBalancerBaseTestWithCompute):
 
         member1 = self.mem_member_client.create_member(
             **member1_kwargs)
-        self.addCleanup(
-            self.mem_member_client.cleanup_member,
-            member1[const.ID], pool_id=self.pool_ids[protocol],
-            lb_client=self.mem_lb_client, lb_id=self.lb_id)
+        # self.addCleanup(
+        #     self.mem_member_client.cleanup_member,
+        #     member1[const.ID], pool_id=self.pool_ids[protocol],
+        #     lb_client=self.mem_lb_client, lb_id=self.lb_id)
         waiters.wait_for_status(
             self.mem_lb_client.show_loadbalancer, self.lb_id,
             const.PROVISIONING_STATUS, const.ACTIVE,
@@ -183,10 +186,10 @@ class TrafficOperationsScenarioTest(test_base.LoadBalancerBaseTestWithCompute):
 
         member2 = self.mem_member_client.create_member(
             **member2_kwargs)
-        self.addCleanup(
-            self.mem_member_client.cleanup_member,
-            member2[const.ID], pool_id=self.pool_ids[protocol],
-            lb_client=self.mem_lb_client, lb_id=self.lb_id)
+        # self.addCleanup(
+        #     self.mem_member_client.cleanup_member,
+        #     member2[const.ID], pool_id=self.pool_ids[protocol],
+        #     lb_client=self.mem_lb_client, lb_id=self.lb_id)
         waiters.wait_for_status(
             self.mem_lb_client.show_loadbalancer, self.lb_id,
             const.PROVISIONING_STATUS, const.ACTIVE,
